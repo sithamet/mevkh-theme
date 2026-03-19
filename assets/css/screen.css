@@ -3341,6 +3341,15 @@ body[class*=" gh-font-heading"]:not(.gh-font-heading-fira-sans):not(.gh-font-hea
     margin-top: 20px;
 }
 
+.has-light-text .gh-button-share {
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.has-light-text .gh-button-share:hover {
+    border-color: rgba(255, 255, 255, 0.85);
+}
+
 .gh-button-share {
     display: inline-flex;
     align-items: center;
@@ -3354,13 +3363,4 @@ body[class*=" gh-font-heading"]:not(.gh-font-heading-fira-sans):not(.gh-font-hea
 
 .gh-button-share:hover {
     border-color: rgba(0, 0, 0, 0.5);
-}
-
-.has-light-text .gh-button-share {
-    border-color: rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.has-light-text .gh-button-share:hover {
-    border-color: rgba(255, 255, 255, 0.85);
 }
