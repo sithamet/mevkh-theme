@@ -1999,7 +1999,6 @@ Search                         LOGO                    Login Subscribe
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 20px;
     margin-left: 6px;
 }
 
@@ -3332,4 +3331,36 @@ body[class*=" gh-font-heading"]:not(.gh-font-heading-fira-sans):not(.gh-font-hea
 
 .pswp--minimal--dark .pswp__top-bar {
     background: none;
+}
+
+/* SHARE */
+.gh-meta-share {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.gh-button-share {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 999px;
+    color: #444;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.4s ease;
+}
+
+.has-light-text .gh-button-share {
+    color: #DDD;
+}
+
+.gh-button-share:hover {
+    border-color: #aaa;
+}
+
+.gh-button-share svg {
+    width: 20px;
+    height: 20px;
 }
