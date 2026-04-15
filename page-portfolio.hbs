@@ -1,0 +1,80 @@
+{{!< default}}
+{{!--
+    page-portfolio.hbs — portfolio grid template
+
+    To use:
+    1. Create a page in Ghost admin with slug "portfolio"
+    2. Write any intro copy in the page body
+    3. Tag posts with #portfolio (internal tag — hidden from public archives)
+       to have them appear in the grid below
+
+    Sorting: Ghost defaults to published_at DESC. Change `order` below if needed.
+--}}
+
+{{#post}}
+<main class="gh-main">
+
+    <header class="gh-article-header gh-canvas">
+        <h1 class="gh-article-title is-title">{{title}}</h1>
+        {{#if custom_excerpt}}
+            <p class="gh-article-excerpt is-body">{{custom_excerpt}}</p>
+        {{/if}}
+    </header>
+
+    {{!-- Intro content from the page body --}}
+    {{#if html}}
+        <section class="gh-content gh-canvas is-body">
+            {{content}}
+        </section>
+    {{/if}}
+
+    {{!-- Portfolio items: all posts tagged with the internal tag #portfolio --}}
+    {{#get "posts" filter="tag:hash-portfolio" limit="100" include="tags,authors" order="published_at desc" as |items|}}
+        {{#if items}}
+            <section class="gh-portfolio gh-canvas">
+                <div class="gh-portfolio-grid">
+                    {{#foreach items}}
+                        <article class="gh-portfolio-card {{post_class}}">
+                            {{#if feature_image}}
+                                <a href="{{url}}" class="gh-portfolio-image">
+                                    <img
+                                        srcset="{{img_url feature_image size="s"}} 300w,
+                                                {{img_url feature_image size="m"}} 600w,
+                                                {{img_url feature_image size="l"}} 1000w"
+                                        sizes="(min-width: 1000px) 33vw, (min-width: 600px) 50vw, 100vw"
+                                        src="{{img_url feature_image size="m"}}"
+                                        alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                                        loading="lazy"
+                                    />
+                                </a>
+                            {{/if}}
+                            <header class="gh-portfolio-meta">
+                                <h2 class="gh-portfolio-title">
+                                    <a href="{{url}}">{{title}}</a>
+                                </h2>
+                                {{#if custom_excerpt}}
+                                    <p class="gh-portfolio-excerpt">{{custom_excerpt}}</p>
+                                {{/if}}
+                                {{#if tags}}
+                                    <ul class="gh-portfolio-tags">
+                                        {{#foreach tags}}
+                                            {{#unless visibility}}{{!-- internal tags skipped, only public tags shown --}}
+                                                <li>{{name}}</li>
+                                            {{/unless}}
+                                        {{/foreach}}
+                                    </ul>
+                                {{/if}}
+                            </header>
+                        </article>
+                    {{/foreach}}
+                </div>
+            </section>
+        {{else}}
+            <section class="gh-canvas is-body">
+                <p><em>No portfolio items yet. Tag posts with <code>#portfolio</code> to have them appear here.</em></p>
+            </section>
+        {{/if}}
+    {{/get}}
+
+</main>
+{{/post}}

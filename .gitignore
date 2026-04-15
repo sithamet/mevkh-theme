@@ -26,3 +26,8 @@ dist/
 config.json
 changelog.md
 changelog.md.bk
+
+# mevkh — never commit secrets
+.secrets/
+*.env
+!.env.example

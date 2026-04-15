@@ -1,0 +1,73 @@
+{{!< default}}
+{{!--
+    page-home.hbs — custom landing page template for mevkh.com
+
+    To use:
+    1. Create a page in Ghost admin with slug "home"
+    2. Settings → General → Make this page your home page
+    3. Ghost will automatically use this template because of the slug match
+
+    Content strategy:
+    - Page title + custom_excerpt = hero text
+    - Feature image = hero background
+    - Page body content = intro section below the hero
+    - Posts tagged #featured = highlighted work teaser grid
+--}}
+
+{{#post}}
+<main class="gh-main">
+
+    {{!-- Hero: uses page title, excerpt, and optional feature image --}}
+    <header class="gh-hero gh-canvas">
+        {{#if feature_image}}
+            <div class="gh-hero-image">
+                <img
+                    srcset="{{img_url feature_image size="s"}} 300w,
+                            {{img_url feature_image size="m"}} 600w,
+                            {{img_url feature_image size="l"}} 1000w,
+                            {{img_url feature_image size="xl"}} 2000w"
+                    src="{{img_url feature_image size="xl"}}"
+                    alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                    loading="eager"
+                />
+            </div>
+        {{/if}}
+        <h1 class="gh-hero-title is-title">{{title}}</h1>
+        {{#if custom_excerpt}}
+            <p class="gh-hero-excerpt is-body">{{custom_excerpt}}</p>
+        {{/if}}
+    </header>
+
+    {{!-- Intro: page body content, rendered as normal Ghost cards --}}
+    {{#if html}}
+        <section class="gh-content gh-canvas is-body">
+            {{content}}
+        </section>
+    {{/if}}
+
+    {{!-- Highlighted work: latest 3 posts tagged #featured (internal tag) --}}
+    {{#get "posts" filter="tag:hash-featured" limit="3" as |featured|}}
+        {{#if featured}}
+            <section class="gh-featured gh-canvas">
+                <h2 class="is-title">Featured</h2>
+                <div class="gh-featured-grid">
+                    {{#foreach featured}}
+                        <article class="gh-featured-card">
+                            {{#if feature_image}}
+                                <a href="{{url}}" class="gh-featured-image">
+                                    <img src="{{img_url feature_image size="m"}}" alt="{{title}}" loading="lazy" />
+                                </a>
+                            {{/if}}
+                            <h3 class="gh-featured-title"><a href="{{url}}">{{title}}</a></h3>
+                            {{#if custom_excerpt}}
+                                <p class="gh-featured-excerpt">{{custom_excerpt}}</p>
+                            {{/if}}
+                        </article>
+                    {{/foreach}}
+                </div>
+            </section>
+        {{/if}}
+    {{/get}}
+
+</main>
+{{/post}}

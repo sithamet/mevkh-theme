@@ -1,0 +1,82 @@
+{{!< default}}
+{{!--
+    page-projects.hbs — projects showcase template
+
+    To use:
+    1. Create a page in Ghost admin with slug "projects"
+    2. Write a page intro (what kinds of projects you work on)
+    3. Tag posts with #project to have them listed below
+
+    Display: full-width cards with larger feature images and excerpts.
+    Sorting: published_at desc (most recent first).
+--}}
+
+{{#post}}
+<main class="gh-main">
+
+    <header class="gh-article-header gh-canvas">
+        <h1 class="gh-article-title is-title">{{title}}</h1>
+        {{#if custom_excerpt}}
+            <p class="gh-article-excerpt is-body">{{custom_excerpt}}</p>
+        {{/if}}
+    </header>
+
+    {{#if html}}
+        <section class="gh-content gh-canvas is-body">
+            {{content}}
+        </section>
+    {{/if}}
+
+    {{#get "posts" filter="tag:hash-project" limit="100" include="tags,authors" order="published_at desc" as |projects|}}
+        {{#if projects}}
+            <section class="gh-projects gh-canvas">
+                {{#foreach projects}}
+                    <article class="gh-project-row {{post_class}}">
+                        {{#if feature_image}}
+                            <a href="{{url}}" class="gh-project-image">
+                                <img
+                                    srcset="{{img_url feature_image size="m"}} 600w,
+                                            {{img_url feature_image size="l"}} 1000w,
+                                            {{img_url feature_image size="xl"}} 2000w"
+                                    sizes="(min-width: 1200px) 900px, 100vw"
+                                    src="{{img_url feature_image size="l"}}"
+                                    alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                                    loading="lazy"
+                                />
+                            </a>
+                        {{/if}}
+                        <div class="gh-project-body">
+                            <header class="gh-project-header">
+                                <h2 class="gh-project-title">
+                                    <a href="{{url}}">{{title}}</a>
+                                </h2>
+                                <div class="gh-project-meta">
+                                    {{#if published_at}}
+                                        <time datetime="{{date published_at format="YYYY-MM-DD"}}">
+                                            {{date published_at format="MMMM YYYY"}}
+                                        </time>
+                                    {{/if}}
+                                    {{#if primary_tag}}
+                                        <span class="gh-project-tag">{{primary_tag.name}}</span>
+                                    {{/if}}
+                                </div>
+                            </header>
+                            {{#if custom_excerpt}}
+                                <p class="gh-project-excerpt">{{custom_excerpt}}</p>
+                            {{else if excerpt}}
+                                <p class="gh-project-excerpt">{{excerpt words="30"}}</p>
+                            {{/if}}
+                            <a href="{{url}}" class="gh-project-link">Read more →</a>
+                        </div>
+                    </article>
+                {{/foreach}}
+            </section>
+        {{else}}
+            <section class="gh-canvas is-body">
+                <p><em>No projects yet. Tag posts with <code>#project</code> to have them listed here.</em></p>
+            </section>
+        {{/if}}
+    {{/get}}
+
+</main>
+{{/post}}
