@@ -1,0 +1,68 @@
+name: Deploy theme to production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+concurrency:
+  group: theme-deploy
+  cancel-in-progress: false  # don't cancel — let each deploy finish cleanly
+
+jobs:
+  validate:
+    name: Validate theme (gscan)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install deps
+        run: yarn install --frozen-lockfile
+
+      - name: Run gscan (fatal on errors)
+        run: yarn test:ci
+
+  deploy:
+    name: Deploy to VPS
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Pull theme update on VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            set -euo pipefail
+            THEME_PATH=/home/ghost/ghost-src/ghost/core/content/themes/mevkh-theme
+            cd "$THEME_PATH"
+            echo "Before: $(git log --oneline -1)"
+            git fetch origin main
+            git reset --hard origin/main
+            echo "After:  $(git log --oneline -1)"
+          EOF
+
+      - name: Smoke test production
+        run: |
+          sleep 2
+          STATUS=$(curl -sS -o /dev/null -w "%{http_code}" https://mevkh.com/)
+          if [ "$STATUS" != "200" ]; then
+            echo "::error::Production site returned HTTP $STATUS (expected 200)"
+            exit 1
+          fi
+          echo "::notice::Production returned HTTP 200 after deploy"
+
+      - name: Cleanup SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
